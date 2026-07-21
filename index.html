@@ -1150,7 +1150,7 @@
         };
 
         function loadAppState() {
-            const saved = localStorage.getItem('jacooodevn_persistent_state_v6');
+            const saved = localStorage.getItem('jacooodevn_persistent_state_v7');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1165,7 +1165,7 @@
         }
 
         function saveAppState() {
-            localStorage.setItem('jacooodevn_persistent_state_v6', JSON.stringify(appState));
+            localStorage.setItem('jacooodevn_persistent_state_v7', JSON.stringify(appState));
         }
 
         async function handleGoogleLogin() {
@@ -1213,7 +1213,7 @@
 
         function resetDemoData() {
             if (confirm('Khôi phục dữ liệu mẫu Demo?')) {
-                localStorage.removeItem('jacooodevn_persistent_state_v6');
+                localStorage.removeItem('jacooodevn_persistent_state_v7');
                 location.reload();
             }
         }
@@ -1251,7 +1251,7 @@
             });
         }
 
-        // Precise Fixed 8-Column Calendar Matrix with Monday-start & padded days
+        // Fixed 8-Column Calendar Matrix with Monday-start & padded days
         function renderOverview() {
             const year = appState.currentYear;
             const month = appState.currentMonth;
@@ -1374,7 +1374,7 @@
             const winRateStr = winRateVal.toFixed(0) + '%';
             const netProfit = filteredTrades.reduce((s, t) => s + Number(t.pnl), 0);
             
-            const activeAccKey = document.getElementById('modalAccount')?.value || 'Live';
+            const activeAccKey = document.getElementById('filterAccount')?.value || 'Live';
             const accBalance = appState.accounts[activeAccKey]?.balance || 100000;
             const returnPctVal = (netProfit / accBalance) * 100;
             const returnPctStr = (returnPctVal >= 0 ? '+' : '') + returnPctVal.toFixed(2) + '%';
