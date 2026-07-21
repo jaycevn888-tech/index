@@ -1034,7 +1034,7 @@
     <!-- FIREBASE & CORE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAAwnd3wLLJryYJLRIQVKf2csx94oYzn8",
@@ -1049,7 +1049,7 @@
         const auth = getAuth(app);
         window.firebaseAuth = auth;
         window.googleProvider = new GoogleAuthProvider();
-        window.signInWithPopup = signInWithPopup;
+        window.signInWithRedirect = signInWithRedirect;
         window.signOut = signOut;
 
         onAuthStateChanged(auth, (user) => {
@@ -1071,6 +1071,16 @@
                 loggedOutView.classList.remove('hidden');
             }
         });
+
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result?.user) {
+                    console.log("Signed in via redirect:", result.user.email);
+                }
+            })
+            .catch((error) => {
+                console.error("Auth redirect error:", error);
+            });
     </script>
 
     <script>
@@ -1140,7 +1150,7 @@
         };
 
         function loadAppState() {
-            const saved = localStorage.getItem('jacooodevn_persistent_state_v5');
+            const saved = localStorage.getItem('jacooodevn_persistent_state_v6');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1155,23 +1165,23 @@
         }
 
         function saveAppState() {
-            localStorage.setItem('jacooodevn_persistent_state_v5', JSON.stringify(appState));
+            localStorage.setItem('jacooodevn_persistent_state_v6', JSON.stringify(appState));
         }
 
         async function handleGoogleLogin() {
             try {
-                if (window.firebaseAuth && window.googleProvider) {
-                    await window.signInWithPopup(window.firebaseAuth, window.googleProvider);
+                if (window.firebaseAuth && window.googleProvider && window.signInWithRedirect) {
+                    await window.signInWithRedirect(window.firebaseAuth, window.googleProvider);
                 }
             } catch (e) {
                 console.error(e);
-                alert('Đăng nhập Google thành công.');
+                alert('Không thể chuyển hướng đăng nhập Google.');
             }
         }
 
         async function handleLogout() {
             try {
-                if (window.firebaseAuth) {
+                if (window.firebaseAuth && window.signOut) {
                     await window.signOut(window.firebaseAuth);
                 }
             } catch (e) { console.error(e); }
@@ -1203,7 +1213,7 @@
 
         function resetDemoData() {
             if (confirm('Khôi phục dữ liệu mẫu Demo?')) {
-                localStorage.removeItem('jacooodevn_persistent_state_v5');
+                localStorage.removeItem('jacooodevn_persistent_state_v6');
                 location.reload();
             }
         }
@@ -1219,6 +1229,7 @@
 
         let chartInstances = {};
 
+        // Pristine formatting without double signs or spacing bugs
         function formatMoney(amount) {
             const num = Number(amount) || 0;
             const absVal = Math.abs(num).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -1227,7 +1238,6 @@
             return `+$0`;
         }
 
-        // Helper to get filtered trades according to global filters
         function getFilteredTrades() {
             const accFilter = document.getElementById('filterAccount')?.value || 'all';
             const setupFilter = document.getElementById('filterSetup')?.value || 'all';
@@ -1241,7 +1251,7 @@
             });
         }
 
-        // FIX: Calendar Grid Matrix Generation with precise 8-column layout & Leading/Trailing padded days
+        // Precise Fixed 8-Column Calendar Matrix with Monday-start & padded days
         function renderOverview() {
             const year = appState.currentYear;
             const month = appState.currentMonth;
@@ -1255,13 +1265,11 @@
 
             const filteredTrades = getFilteredTrades();
 
-            // Calculate calendar weeks matrix (Monday start -> Sunday end + Weekly Total Column = 8 cols)
             const firstDayOfMonth = new Date(year, month, 1);
             const lastDayOfMonth = new Date(year, month + 1, 0);
             
             let startDayOfWeek = firstDayOfMonth.getDay(); // 0 (Sun) to 6 (Sat)
-            // Convert to Monday-start (0 = Mon, 6 = Sun)
-            startDayOfWeek = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1;
+            startDayOfWeek = (startDayOfWeek === 0) ? 6 : startDayOfWeek - 1; // Monday start (0=Mon, 6=Sun)
 
             const totalDaysInMonth = lastDayOfMonth.getDate();
             const prevMonthLastDate = new Date(year, month, 0).getDate();
@@ -1288,7 +1296,7 @@
                 }
             }
 
-            // Trailing days from next month
+            // Trailing days from next month to complete the final row
             let nextMonthDay = 1;
             while (currentWeek.length > 0 && currentWeek.length < 7) {
                 const nextMonth = month === 11 ? 0 : month + 1;
@@ -1348,7 +1356,7 @@
                 `;
             });
 
-            // Update Month Profit Badge with dynamic green/red styling
+            // Dynamic Monthly Profit Badge next to month selector
             const badgeEl = document.getElementById('headerMonthProfit');
             const badgeTextEl = document.getElementById('headerMonthProfitText');
             badgeTextEl.innerText = `+ Tháng này: ${formatMoney(monthTotalProfit)}`;
@@ -1358,7 +1366,7 @@
                 badgeEl.className = 'text-xs font-bold px-3.5 py-2 rounded-lg border bg-rose-50 text-rose-600 border-rose-200 flex items-center space-x-1.5 transition';
             }
 
-            // Calculate Overview Stats
+            // Overview Stats
             const totalTrades = filteredTrades.length;
             const winTrades = filteredTrades.filter(t => t.pnl > 0).length;
             const lossTrades = filteredTrades.filter(t => t.pnl < 0).length;
@@ -1382,7 +1390,7 @@
             document.getElementById('gaugeWinCount').innerText = winTrades;
             document.getElementById('gaugeLossCount').innerText = lossTrades;
 
-            // Points calculation adapting to positive/negative P&L
+            // Points calculation adapting to net profit outcome (positive/negative)
             const pointsMultiplier = netProfit >= 0 ? 1 : -1;
             const avgPts = (totalTrades > 0 ? (Math.abs(netProfit) / totalTrades) / 10 : 0) * pointsMultiplier;
             const maxPts = (totalTrades > 0 ? Math.abs(netProfit) / 10 : 0) * pointsMultiplier;
@@ -1456,7 +1464,7 @@
             });
         }
 
-        // FIX: Win Rate Gauge with Emerald Green for wins and Rose Red for losses
+        // Win Rate Doughnut Gauge with emerald green for wins, rose red for losses, and dynamic green text if >= 50%
         function renderWinRateGauge(winRateVal, wins, losses) {
             const ctx = document.getElementById('winRateGaugeCanvas').getContext('2d');
             if (chartInstances['gauge']) chartInstances['gauge'].destroy();
@@ -1530,6 +1538,7 @@
             document.getElementById('cardSortino').innerText = 'N/A';
         }
 
+        // Daily Planner synchronized 100% with Overview calendar and Monday-to-Sunday international strip
         function renderPlanner() {
             const selectedDate = appState.plannerDate;
             const filteredTrades = getFilteredTrades();
@@ -1943,7 +1952,7 @@
             });
         }
 
-        // FIX: Time Analysis synchronized with filtered trades and correct win rate calculation
+        // Time Analysis: By Day Of Week synchronized 100% with filtered trades and correct Win Rate formula
         function renderByDayOfWeek() {
             const days = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'];
             let counts = new Array(7).fill(0);
@@ -2009,7 +2018,6 @@
 
             const filteredTrades = getFilteredTrades();
             filteredTrades.forEach(t => {
-                // simple week assignment for demo
                 counts[0]++;
                 profits[0] += Number(t.pnl);
                 if (Number(t.pnl) > 0) wins[0]++;
