@@ -33,7 +33,7 @@
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
 
-    <!-- HEADER (Cố định sticky top-0) -->
+    <!-- HEADER (Sticky top-0 z-40) -->
     <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm flex-shrink-0">
         <div class="flex items-center space-x-6">
             <div class="flex items-center space-x-2">
@@ -96,8 +96,8 @@
         </div>
     </header>
 
-    <div class="flex-1 flex overflow-hidden">
-        <!-- SIDEBAR (Cố định sticky top-16 h-[calc(100vh-4rem)]) -->
+    <div class="flex-1 flex overflow-hidden relative">
+        <!-- SIDEBAR (Sticky top-16 h-[calc(100vh-4rem)]) -->
         <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30 flex-shrink-0 select-none hidden lg:flex">
             <div class="py-6 px-4 space-y-8">
                 <div>
@@ -201,11 +201,11 @@
                             <span id="overviewMonthTitle" class="text-xs font-bold px-3 text-slate-800">Tháng 7 năm 2026</span>
                             <button onclick="shiftMonth(1)" class="w-7 h-7 flex items-center justify-center rounded hover:bg-white text-slate-600 transition"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                         </div>
-                    </div>
-                    <!-- Monthly Profit Badge next to month controls -->
-                    <div id="headerMonthProfit" class="text-xs font-bold px-3.5 py-2 rounded-lg border flex items-center space-x-1.5 transition">
-                        <i class="fa-solid fa-arrow-trend-up"></i>
-                        <span id="headerMonthProfitText">+ Tháng này: +$0</span>
+                        <!-- Monthly Profit Badge next to month controls -->
+                        <div id="headerMonthProfit" class="text-xs font-bold px-3.5 py-2 rounded-lg border flex items-center space-x-1.5 transition">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                            <span id="headerMonthProfitText">+ Tháng này: +$0</span>
+                        </div>
                     </div>
                 </div>
 
@@ -328,7 +328,7 @@
                             <div class="relative w-28 h-28 mx-auto my-1 flex items-center justify-center">
                                 <canvas id="winRateGaugeCanvas"></canvas>
                                 <div class="absolute inset-0 flex flex-col items-center justify-center pt-2 pointer-events-none">
-                                    <span class="text-lg font-black" id="gaugeWinRate">0%</span>
+                                    <span class="text-lg font-black text-slate-800" id="gaugeWinRate">0%</span>
                                     <span class="text-[9px] font-bold text-slate-400 uppercase">TỶ LỆ THẮNG</span>
                                 </div>
                             </div>
@@ -415,8 +415,8 @@
                         </div>
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
                             <span class="text-xs font-bold text-slate-600 uppercase block">CONSISTENCY</span>
-                            <div class="text-2xl font-black text-slate-800 my-2" id="cardConsistency">0.00</div>
-                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full w-full" id="consistencyBar"></div></div>
+                            <div class="text-2xl font-black text-slate-800 my-2" id="cardConsistency">0.00%</div>
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full transition-all duration-300" id="consistencyBar" style="width: 0%"></div></div>
                         </div>
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
                             <span class="text-xs font-bold text-slate-600 uppercase block">SHARPE RATIO</span>
@@ -580,7 +580,7 @@
                             <div class="relative w-40 h-40 flex items-center justify-center">
                                 <canvas id="winRateLargeGauge"></canvas>
                                 <div class="absolute inset-0 flex flex-col items-center justify-center pt-4 pointer-events-none">
-                                    <span class="text-2xl font-black" id="largeGaugeVal">0%</span>
+                                    <span class="text-2xl font-black text-slate-800" id="largeGaugeVal">0%</span>
                                     <span class="text-[10px] font-bold text-slate-400 uppercase">WINNING RATE</span>
                                 </div>
                             </div>
@@ -787,7 +787,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="font-bold text-slate-700 block mb-1">Kết quả P&L ($)</label>
+                        <label class="font-bold text-slate-700 block mb-1">Kết quả P&L ($) *</label>
                         <input type="number" step="any" id="modalPnl" oninput="calculateReturnFromPnl()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-bold text-emerald-600 focus:outline-none focus:border-blue-500" placeholder="e.g. 1161.6">
                     </div>
                     <div>
@@ -953,11 +953,7 @@
             getFirestore, 
             doc, 
             setDoc, 
-            getDoc, 
-            collection, 
-            getDocs, 
-            deleteDoc, 
-            onSnapshot 
+            getDoc 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -982,10 +978,6 @@
         window.doc = doc;
         window.setDoc = setDoc;
         window.getDoc = getDoc;
-        window.collection = collection;
-        window.getDocs = getDocs;
-        window.deleteDoc = deleteDoc;
-        window.onSnapshot = onSnapshot;
 
         window.signInWithGoogle = async function() {
             try {
@@ -1496,40 +1488,76 @@
 
         function renderAdvancedCards(netProfit, wins, losses, totalTrades, balance) {
             const filteredTrades = getFilteredTrades();
-            const grossProfit = filteredTrades.filter(t => t.pnl > 0).reduce((s,t) => s + Number(t.pnl), 0);
-            const grossLoss = Math.abs(filteredTrades.filter(t => t.pnl < 0).reduce((s,t) => s + Number(t.pnl), 0));
+            
+            const validWins = filteredTrades.filter(t => Number(t.pnl) > 0);
+            const validLosses = filteredTrades.filter(t => Number(t.pnl) < 0);
+
+            const grossProfit = validWins.reduce((s,t) => s + Number(t.pnl), 0);
+            const grossLoss = Math.abs(validLosses.reduce((s,t) => s + Number(t.pnl), 0));
+            
+            // Profit Factor = Gross Profit / Gross Loss (based strictly on P&L)
             const pf = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : (grossProfit > 0 ? '99.00' : '0.00');
 
             document.getElementById('advancedProfitFactor').innerText = pf;
             document.getElementById('advGrossProfit').innerText = `Gross Profit: $${grossProfit.toLocaleString()}`;
             document.getElementById('advGrossLoss').innerText = `Gross Loss: -$${grossLoss.toLocaleString()}`;
 
-            const avgWin = wins > 0 ? grossProfit / wins : 0;
-            const avgLoss = losses > 0 ? grossLoss / losses : 0;
+            const avgWin = validWins.length > 0 ? grossProfit / validWins.length : 0;
+            const avgLoss = validLosses.length > 0 ? grossLoss / validLosses.length : 0;
+            
+            // R:R & Expectancy based strictly on P&L
             const rr = avgLoss > 0 ? (avgWin / avgLoss).toFixed(2) : 'N/A';
             document.getElementById('advancedRR').innerText = rr;
             document.getElementById('advAvgWin').innerText = `Avg Win: $${avgWin.toFixed(0)}`;
             document.getElementById('advAvgLoss').innerText = `Avg Loss: -$${avgLoss.toFixed(0)}`;
 
-            const expectancy = totalTrades > 0 ? netProfit / totalTrades : 0;
+            const winRate = totalTrades > 0 ? wins / totalTrades : 0;
+            const lossRate = totalTrades > 0 ? losses / totalTrades : 0;
+            const expectancy = (winRate * avgWin) - (lossRate * avgLoss);
+            
             document.getElementById('cardExpectancy').innerText = formatPnlString(expectancy);
-            document.getElementById('cardExpWinRate').innerText = totalTrades > 0 ? ((wins/totalTrades)*100).toFixed(0) + '%' : '0%';
+            document.getElementById('cardExpWinRate').innerText = totalTrades > 0 ? (winRate*100).toFixed(0) + '%' : '0%';
             document.getElementById('cardExpAvgWin').innerText = `+$${avgWin.toFixed(0)}`;
 
             if (totalTrades > 0) {
-                document.getElementById('cardTopSymbolContainer').innerHTML = `<div class="flex justify-between font-bold text-slate-800"><span>NQ</span><span class="${netProfit>=0?'text-emerald-600':'text-rose-600'}">${formatPnlString(netProfit)}</span></div><div class="text-[11px] text-slate-500">${totalTrades} lệnh | ${((wins/totalTrades)*100).toFixed(0)}% wr</div>`;
-                document.getElementById('cardTopSetupContainer').innerHTML = `<div class="flex justify-between font-bold text-slate-800"><span>REVERSAL</span><span class="${netProfit>=0?'text-emerald-600':'text-rose-600'}">${formatPnlString(netProfit)}</span></div><div class="text-[11px] text-slate-500">${totalTrades} lệnh | ${((wins/totalTrades)*100).toFixed(0)}% wr</div>`;
-                document.getElementById('cardTopTagContainer').innerHTML = `<div class="flex justify-between font-bold text-slate-800"><span>DISCIPLINE</span><span class="${netProfit>=0?'text-emerald-600':'text-rose-600'}">${formatPnlString(netProfit)}</span></div><div class="text-[11px] text-slate-500">${totalTrades} lệnh | ${((wins/totalTrades)*100).toFixed(0)}% wr</div>`;
+                document.getElementById('cardTopSymbolContainer').innerHTML = `<div class="flex justify-between font-bold text-slate-800"><span>NQ</span><span class="${netProfit>=0?'text-emerald-600':'text-rose-600'}">${formatPnlString(netProfit)}</span></div><div class="text-[11px] text-slate-500">${totalTrades} lệnh | ${(winRate*100).toFixed(0)}% wr</div>`;
+                document.getElementById('cardTopSetupContainer').innerHTML = `<div class="flex justify-between font-bold text-slate-800"><span>REVERSAL</span><span class="${netProfit>=0?'text-emerald-600':'text-rose-600'}">${formatPnlString(netProfit)}</span></div><div class="text-[11px] text-slate-500">${totalTrades} lệnh | ${(winRate*100).toFixed(0)}% wr</div>`;
+                document.getElementById('cardTopTagContainer').innerHTML = `<div class="flex justify-between font-bold text-slate-800"><span>DISCIPLINE</span><span class="${netProfit>=0?'text-emerald-600':'text-rose-600'}">${formatPnlString(netProfit)}</span></div><div class="text-[11px] text-slate-500">${totalTrades} lệnh | ${(winRate*100).toFixed(0)}% wr</div>`;
             }
 
             document.getElementById('cardTotalTradesCount').innerText = totalTrades;
             document.getElementById('cardLongestWin').innerText = `${wins} trades`;
             document.getElementById('cardLongestLoss').innerText = `${losses} trades`;
             document.getElementById('cardCurrentStreak').innerText = `${wins} wins`;
-            document.getElementById('cardPeakVal').innerText = formatPnlString(Math.max(0, netProfit));
-            document.getElementById('cardMaxDD').innerText = `$0`;
-            document.getElementById('cardRecoveryFactor').innerText = grossLoss > 0 ? (netProfit / grossLoss).toFixed(2) : (netProfit > 0 ? '15.00' : '0.00');
-            document.getElementById('cardConsistency').innerText = '1.00';
+
+            // Peak-to-Trough Drawdown & Recovery Factor based on P&L series
+            const sortedByDate = [...filteredTrades].sort((a,b) => new Date(a.date) - new Date(b.date));
+            let peak = 0;
+            let maxDD = 0;
+            let runningSum = 0;
+            sortedByDate.forEach(t => {
+                runningSum += Number(t.pnl);
+                if (runningSum > peak) {
+                    peak = runningSum;
+                }
+                const dd = peak - runningSum;
+                if (dd > maxDD) {
+                    maxDD = dd;
+                }
+            });
+
+            document.getElementById('cardPeakVal').innerText = formatPnlString(Math.max(0, peak));
+            document.getElementById('cardMaxDD').innerText = maxDD > 0 ? `-$${maxDD.toLocaleString()}` : `$0`;
+
+            const recoveryFactor = maxDD > 0 ? (netProfit / maxDD).toFixed(2) : (netProfit > 0 ? '15.00' : '0.00');
+            document.getElementById('cardRecoveryFactor').innerText = recoveryFactor;
+
+            // Consistency = (Max Winning Trade / Total Net P&L) * 100%
+            const maxWinTrade = validWins.length > 0 ? Math.max(...validWins.map(t => Number(t.pnl))) : 0;
+            const consistencyPct = netProfit > 0 ? Math.min(100, (maxWinTrade / netProfit) * 100) : 0;
+            document.getElementById('cardConsistency').innerText = consistencyPct.toFixed(2) + '%';
+            document.getElementById('consistencyBar').style.width = Math.min(100, Math.max(0, consistencyPct)) + '%';
+
             document.getElementById('cardSharpe').innerText = '6.95';
             document.getElementById('cardSortino').innerText = 'N/A';
         }
@@ -1753,9 +1781,9 @@
             const accKey = document.getElementById('modalAccount').value;
             const accBalance = appState.accounts[accKey]?.balance || 100000;
 
-            let diff = type === 'LONG' ? (close - entry) : (entry - close);
-            let pnl = diff * vol * 20; 
             if (entry && close) {
+                let diff = type === 'LONG' ? (close - entry) : (entry - close);
+                let pnl = diff * vol * 20; 
                 document.getElementById('modalPnl').value = pnl.toFixed(2);
                 const returnPct = (pnl / accBalance) * 100;
                 document.getElementById('modalReturnPct').value = returnPct.toFixed(2);
@@ -1898,6 +1926,12 @@
         async function saveTradeRecord() {
             const saveBtn = document.getElementById('saveTradeBtn');
             try {
+                const pnlVal = Number(document.getElementById('modalPnl').value);
+                if (isNaN(pnlVal)) {
+                    alert("Vui lòng nhập kết quả P&L ($) hợp lệ!");
+                    return;
+                }
+
                 if (saveBtn) {
                     saveBtn.disabled = true;
                     saveBtn.innerText = 'Đang lưu...';
@@ -1908,11 +1942,10 @@
                 const date = document.getElementById('modalDate').value;
                 const symbol = document.getElementById('modalSymbol').value;
                 const type = document.getElementById('modalType').value;
-                const entry = Number(document.getElementById('modalEntry').value);
-                const close = Number(document.getElementById('modalClose').value);
+                const entry = Number(document.getElementById('modalEntry').value) || 0;
+                const close = Number(document.getElementById('modalClose').value) || 0;
                 const volume = Number(document.getElementById('modalVolume').value);
                 const fees = Number(document.getElementById('modalFees').value);
-                const pnl = Number(document.getElementById('modalPnl').value);
                 const returnPct = Number(document.getElementById('modalReturnPct').value);
                 const setup = document.getElementById('modalSetup').value;
                 const tag = document.getElementById('modalTag').value;
@@ -1926,7 +1959,7 @@
 
                 const chartImgs = currentModalImages.length > 0 ? currentModalImages : ['https://placehold.co/600x400/1e293b/ffffff?text=Trade+Chart'];
 
-                const tradeObj = { id, account, date, symbol, type, entry, close, volume, fees, pnl, returnPct, setup, tag, confluences, notes, duration, hour, tvLink, chartImgs };
+                const tradeObj = { id, account, date, symbol, type, entry, close, volume, fees, pnl: pnlVal, returnPct, setup, tag, confluences, notes, duration, hour, tvLink, chartImgs };
 
                 const existingIdx = appState.trades.findIndex(t => t.id === id);
                 if (existingIdx >= 0) {
@@ -1935,9 +1968,11 @@
                     appState.trades.unshift(tradeObj);
                 }
 
-                await saveAppState();
+                saveAppStateLocally();
+                await saveCloudData();
                 closeTradeModal();
                 switchTab(appState.currentTab);
+                alert("Lưu giao dịch thành công!");
             } catch (err) {
                 console.error("Lỗi khi lưu giao dịch:", err);
                 alert("Đã xảy ra lỗi khi lưu giao dịch: " + err.message);
@@ -1953,7 +1988,8 @@
         async function deleteTrade(id) {
             if (confirm('Bạn có chắc muốn xóa giao dịch này?')) {
                 appState.trades = appState.trades.filter(t => t.id !== id);
-                await saveAppState();
+                saveAppStateLocally();
+                await saveCloudData();
                 switchTab(appState.currentTab);
             }
         }
@@ -1998,7 +2034,8 @@
                 if (appState.activeAccount === accKey) {
                     appState.activeAccount = Object.keys(appState.accounts)[0] || 'Live';
                 }
-                await saveAppState();
+                saveAppStateLocally();
+                await saveCloudData();
                 updateAccountSelectors();
                 renderAccountManageList();
                 switchTab(appState.currentTab);
@@ -2011,7 +2048,8 @@
             const key = accName.replace(/\s+/g, '_');
             appState.accounts[key] = { name: accName, balance: accBal };
             appState.activeAccount = key;
-            await saveAppState();
+            saveAppStateLocally();
+            await saveCloudData();
             updateAccountSelectors();
             alert(`Đã thêm tài khoản ${accName} ($${accBal.toLocaleString()}) thành công!`);
             closeAccountModal();
