@@ -100,7 +100,6 @@
         <!-- SIDEBAR (Ô số 1 - Cố định sticky top-16 h-[calc(100vh-4rem)]) -->
         <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30 flex-shrink-0 select-none hidden lg:flex">
             <div class="py-6 px-4 space-y-8">
-                <!-- Đã xóa logo trùng lặp theo yêu cầu -->
                 <div>
                     <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-3">General</h3>
                     <nav class="space-y-1">
@@ -871,7 +870,7 @@
                     <label class="font-bold text-slate-700 block mb-1">Link biểu đồ TradingView</label>
                     <input type="text" id="modalTvLink" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-medium text-slate-700 focus:outline-none focus:border-blue-500 mb-3" placeholder="e.g. https://www.tradingview.com/x/...">
                     
-                    <label class="font-bold text-slate-700 block mb-1">Ảnh chụp lệnh (Hỗ trợ từ 2 ảnh trở lên)</label>
+                    <label class="font-bold text-slate-700 block mb-1">Ảnh chụp lệnh (Hỗ trợ từ 2 ảnh trở lên, dùng chung thoải mái)</label>
                     <div class="flex items-center space-x-2">
                         <input type="text" id="modalChartImgInput" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-medium text-slate-700 focus:outline-none focus:border-blue-500" placeholder="Dán URL ảnh hoặc chọn tệp">
                         <button type="button" onclick="addChartImageFromInput()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg text-xs transition">Thêm URL</button>
