@@ -33,7 +33,7 @@
 </head>
 <body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
 
-    <!-- HEADER (Ô số 2 - Cố định sticky top-0) -->
+    <!-- HEADER (Cố định sticky top-0) -->
     <header class="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-40 shadow-sm flex-shrink-0">
         <div class="flex items-center space-x-6">
             <div class="flex items-center space-x-2">
@@ -97,7 +97,7 @@
     </header>
 
     <div class="flex-1 flex overflow-hidden">
-        <!-- SIDEBAR (Ô số 1 - Cố định sticky top-16 h-[calc(100vh-4rem)]) -->
+        <!-- SIDEBAR (Cố định sticky top-16 h-[calc(100vh-4rem)]) -->
         <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30 flex-shrink-0 select-none hidden lg:flex">
             <div class="py-6 px-4 space-y-8">
                 <div>
@@ -211,7 +211,7 @@
 
                 <!-- Calendar Grid & Side Stats -->
                 <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                    <!-- Calendar Grid (Cols 1-8) - Monday to Sunday (International Sequence) -->
+                    <!-- Calendar Grid (Cols 1-8) - Monday to Sunday -->
                     <div class="xl:col-span-8 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
                         <div class="grid grid-cols-8 gap-2 mb-3 text-center">
                             <div class="text-[11px] font-bold text-slate-400 uppercase">THỨ HAI</div>
@@ -870,7 +870,7 @@
                     <label class="font-bold text-slate-700 block mb-1">Link biểu đồ TradingView</label>
                     <input type="text" id="modalTvLink" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-medium text-slate-700 focus:outline-none focus:border-blue-500 mb-3" placeholder="e.g. https://www.tradingview.com/x/...">
                     
-                    <label class="font-bold text-slate-700 block mb-1">Ảnh chụp lệnh (Hỗ trợ từ 2 ảnh trở lên, dùng chung thoải mái)</label>
+                    <label class="font-bold text-slate-700 block mb-1">Ảnh chụp lệnh (Hỗ trợ từ 2 ảnh trở lên)</label>
                     <div class="flex items-center space-x-2">
                         <input type="text" id="modalChartImgInput" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-medium text-slate-700 focus:outline-none focus:border-blue-500" placeholder="Dán URL ảnh hoặc chọn tệp">
                         <button type="button" onclick="addChartImageFromInput()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2.5 rounded-lg text-xs transition">Thêm URL</button>
@@ -886,8 +886,8 @@
                 </div>
             </div>
             <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex justify-end space-x-3">
-                <button onclick="closeTradeModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition">Hủy</button>
-                <button onclick="saveTradeRecord()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-lg text-xs shadow-md shadow-blue-500/20 transition">Lưu Giao Dịch</button>
+                <button type="button" onclick="closeTradeModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition">Hủy</button>
+                <button type="button" id="saveTradeBtn" onclick="saveTradeRecord()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-lg text-xs shadow-md shadow-blue-500/20 transition">Lưu Giao Dịch</button>
             </div>
         </div>
     </div>
@@ -936,20 +936,6 @@
             <button class="absolute -top-4 -right-4 bg-white text-slate-900 w-9 h-9 rounded-full font-bold shadow-lg flex items-center justify-center hover:bg-slate-200 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
-        </div>
-    </div>
-
-    <!-- NOTE EXPAND MODAL -->
-    <div id="noteModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
-                <h3 class="font-bold text-sm tracking-wide">CHI TIẾT NỘI DUNG GHI CHÚ</h3>
-                <button onclick="closeNoteModal()" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="p-6 text-xs text-slate-700 whitespace-pre-wrap max-h-[60vh] overflow-y-auto leading-relaxed" id="modalNoteContent"></div>
-            <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end">
-                <button onclick="closeNoteModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition">Đóng</button>
-            </div>
         </div>
     </div>
 
@@ -1004,7 +990,6 @@
         window.signInWithGoogle = async function() {
             try {
                 const result = await signInWithPopup(auth, googleProvider);
-                console.log("Đăng nhập Google thành công:", result.user);
                 window.updateLoginUI(result.user);
                 await window.syncDataFromCloud(result.user.uid);
             } catch (error) {
@@ -1087,7 +1072,7 @@
 
         window.syncDataFromCloud = async function(uid) {
             try {
-                const userDocRef = window.doc(window.db, "users", uid);
+                const userDocRef = window.doc(window.db, "users", uid, "data", "journalState");
                 const userSnap = await window.getDoc(userDocRef);
                 if (userSnap.exists()) {
                     const data = userSnap.data();
@@ -1106,7 +1091,7 @@
             } catch (e) {
                 console.error("Cloud sync error:", e);
             }
-            saveAppState();
+            saveAppStateLocally();
             switchTab(appState.currentTab);
         };
 
@@ -1114,7 +1099,7 @@
             const user = window.firebaseAuth?.currentUser;
             if (user) {
                 try {
-                    const userDocRef = window.doc(window.db, "users", user.uid);
+                    const userDocRef = window.doc(window.db, "users", user.uid, "data", "journalState");
                     await window.setDoc(userDocRef, {
                         trades: appState.trades,
                         planners: appState.planners,
@@ -1148,8 +1133,12 @@
             switchTab(appState.currentTab);
         };
 
-        function saveAppState() {
+        function saveAppStateLocally() {
             localStorage.setItem('jacooodevn_persistent_state_v30', JSON.stringify(appState));
+        }
+
+        function saveAppState() {
+            saveAppStateLocally();
             saveCloudData();
         }
 
@@ -1379,7 +1368,7 @@
             document.getElementById('gaugeWinCount').innerText = winTrades;
             document.getElementById('gaugeLossCount').innerText = lossTrades;
 
-            // Accurate Points calculation based on Price Distance (Entry vs Close)
+            // Points calculation based on Price Distance (Entry vs Close)
             let totalPoints = 0;
             let maxWinPts = 0;
             let maxLossPts = 0;
@@ -1393,12 +1382,12 @@
                 if (pts < maxLossPts) maxLossPts = pts;
             });
             const avgPts = totalTrades > 0 ? totalPoints / totalTrades : 0;
-
             const isMonthNegative = netProfit < 0;
-            document.getElementById('stat-avg-pts').innerText = `${isMonthNegative ? '-' : ''}${Math.abs(avgPts).toFixed(1)} pts`;
-            document.getElementById('stat-max-win-pts').innerText = `${isMonthNegative ? '-' : ''}${Math.abs(maxWinPts).toFixed(1)} pts`;
-            document.getElementById('stat-max-loss-pts').innerText = `${isMonthNegative ? '-' : ''}${Math.abs(maxLossPts).toFixed(1)} pts`;
-            document.getElementById('stat-total-pts').innerText = `${isMonthNegative ? '-' : ''}${Math.abs(totalPoints).toFixed(1)} pts`;
+
+            document.getElementById('stat-avg-pts').innerText = `${isMonthNegative && avgPts > 0 ? '-' : ''}${avgPts.toFixed(1)} pts`;
+            document.getElementById('stat-max-win-pts').innerText = `${maxWinPts.toFixed(1)} pts`;
+            document.getElementById('stat-max-loss-pts').innerText = `${maxLossPts.toFixed(1)} pts`;
+            document.getElementById('stat-total-pts').innerText = `${totalPoints.toFixed(1)} pts`;
 
             renderCumulativeChart();
             renderWinRateGauge(winRateVal, winTrades, lossTrades);
@@ -1830,7 +1819,7 @@
                         <td class="p-3.5"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] font-semibold">${t.tag}</span></td>
                         <td class="p-3.5">${confluencesHtml}</td>
                         <td class="p-3.5 max-w-xs text-slate-600">
-                            <div class="whitespace-pre-wrap break-words leading-relaxed max-h-24 overflow-y-auto pr-1">${notesText || '<span class="text-slate-300">Không có ghi chú</span>'}</div>
+                            <div class="whitespace-pre-wrap break-words leading-relaxed max-h-28 overflow-y-auto pr-1">${notesText || '<span class="text-slate-300">Không có ghi chú</span>'}</div>
                         </td>
                         <td class="p-3.5 text-center">${chartThumbHtml}</td>
                         <td class="p-3.5 text-center space-x-2">
@@ -1906,49 +1895,65 @@
 
         function closeTradeModal() { document.getElementById('tradeModal').classList.add('hidden'); }
 
-        function saveTradeRecord() {
-            const id = document.getElementById('editTradeId').value || 't-' + Date.now();
-            const account = document.getElementById('modalAccount').value;
-            const date = document.getElementById('modalDate').value;
-            const symbol = document.getElementById('modalSymbol').value;
-            const type = document.getElementById('modalType').value;
-            const entry = Number(document.getElementById('modalEntry').value);
-            const close = Number(document.getElementById('modalClose').value);
-            const volume = Number(document.getElementById('modalVolume').value);
-            const fees = Number(document.getElementById('modalFees').value);
-            const pnl = Number(document.getElementById('modalPnl').value);
-            const returnPct = Number(document.getElementById('modalReturnPct').value);
-            const setup = document.getElementById('modalSetup').value;
-            const tag = document.getElementById('modalTag').value;
-            const notes = document.getElementById('modalNotes').value;
-            const duration = document.getElementById('modalDuration').value;
-            const hour = document.getElementById('modalHour').value;
-            const tvLink = document.getElementById('modalTvLink').value;
-            
-            const confluences = [];
-            document.querySelectorAll('input[name="smcConfluence"]:checked').forEach(cb => confluences.push(cb.value));
+        async function saveTradeRecord() {
+            const saveBtn = document.getElementById('saveTradeBtn');
+            try {
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.innerText = 'Đang lưu...';
+                }
 
-            const chartImgs = currentModalImages.length > 0 ? currentModalImages : ['https://placehold.co/600x400/1e293b/ffffff?text=Trade+Chart'];
+                const id = document.getElementById('editTradeId').value || 't-' + Date.now();
+                const account = document.getElementById('modalAccount').value;
+                const date = document.getElementById('modalDate').value;
+                const symbol = document.getElementById('modalSymbol').value;
+                const type = document.getElementById('modalType').value;
+                const entry = Number(document.getElementById('modalEntry').value);
+                const close = Number(document.getElementById('modalClose').value);
+                const volume = Number(document.getElementById('modalVolume').value);
+                const fees = Number(document.getElementById('modalFees').value);
+                const pnl = Number(document.getElementById('modalPnl').value);
+                const returnPct = Number(document.getElementById('modalReturnPct').value);
+                const setup = document.getElementById('modalSetup').value;
+                const tag = document.getElementById('modalTag').value;
+                const notes = document.getElementById('modalNotes').value;
+                const duration = document.getElementById('modalDuration').value;
+                const hour = document.getElementById('modalHour').value;
+                const tvLink = document.getElementById('modalTvLink').value;
+                
+                const confluences = [];
+                document.querySelectorAll('input[name="smcConfluence"]:checked').forEach(cb => confluences.push(cb.value));
 
-            const tradeObj = { id, account, date, symbol, type, entry, close, volume, fees, pnl, returnPct, setup, tag, confluences, notes, duration, hour, tvLink, chartImgs };
+                const chartImgs = currentModalImages.length > 0 ? currentModalImages : ['https://placehold.co/600x400/1e293b/ffffff?text=Trade+Chart'];
 
-            const existingIdx = appState.trades.findIndex(t => t.id === id);
-            if (existingIdx >= 0) {
-                appState.trades[existingIdx] = tradeObj;
-            } else {
-                appState.trades.unshift(tradeObj);
+                const tradeObj = { id, account, date, symbol, type, entry, close, volume, fees, pnl, returnPct, setup, tag, confluences, notes, duration, hour, tvLink, chartImgs };
+
+                const existingIdx = appState.trades.findIndex(t => t.id === id);
+                if (existingIdx >= 0) {
+                    appState.trades[existingIdx] = tradeObj;
+                } else {
+                    appState.trades.unshift(tradeObj);
+                }
+
+                await saveAppState();
+                closeTradeModal();
+                switchTab(appState.currentTab);
+            } catch (err) {
+                console.error("Lỗi khi lưu giao dịch:", err);
+                alert("Đã xảy ra lỗi khi lưu giao dịch: " + err.message);
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = 'Lưu Giao Dịch';
+                }
             }
-
-            saveAppState();
-            closeTradeModal();
-            switchTab(appState.currentTab);
         }
 
         function editTrade(id) { openTradeModal(id); }
-        function deleteTrade(id) {
+        async function deleteTrade(id) {
             if (confirm('Bạn có chắc muốn xóa giao dịch này?')) {
                 appState.trades = appState.trades.filter(t => t.id !== id);
-                saveAppState();
+                await saveAppState();
                 switchTab(appState.currentTab);
             }
         }
@@ -1958,12 +1963,6 @@
             document.getElementById('lightboxModal').classList.remove('hidden');
         }
         function closeLightbox() { document.getElementById('lightboxModal').classList.add('hidden'); }
-
-        function openNoteModal(noteText) {
-            document.getElementById('modalNoteContent').innerText = noteText || 'Không có nội dung ghi chú.';
-            document.getElementById('noteModal').classList.remove('hidden');
-        }
-        function closeNoteModal() { document.getElementById('noteModal').classList.add('hidden'); }
 
         function openAccountModal() { document.getElementById('accountModal').classList.remove('hidden'); }
         function closeAccountModal() { document.getElementById('accountModal').classList.add('hidden'); }
@@ -1992,27 +1991,27 @@
             }
         }
 
-        function deleteAccount(accKey) {
-            if (confirm(`Bạn có chắc muốn xóa tài khoản "${accKey}"? Tất cả giao dịch và kế hoạch của tài khoản này cũng sẽ bị xóa vĩnh viễn!`)) {
+        async function deleteAccount(accKey) {
+            if (confirm(`Bạn có chắc muốn xóa tài khoản "${accKey}"? Tất cả giao dịch của tài khoản này cũng sẽ bị xóa vĩnh viễn!`)) {
                 delete appState.accounts[accKey];
                 appState.trades = appState.trades.filter(t => t.account !== accKey);
                 if (appState.activeAccount === accKey) {
                     appState.activeAccount = Object.keys(appState.accounts)[0] || 'Live';
                 }
-                saveAppState();
+                await saveAppState();
                 updateAccountSelectors();
                 renderAccountManageList();
                 switchTab(appState.currentTab);
             }
         }
 
-        function addNewAccount() {
+        async function addNewAccount() {
             const accName = document.getElementById('newAccountName').value.trim() || 'Custom';
             const accBal = Number(document.getElementById('newAccountBalance').value) || 50000;
             const key = accName.replace(/\s+/g, '_');
             appState.accounts[key] = { name: accName, balance: accBal };
             appState.activeAccount = key;
-            saveAppState();
+            await saveAppState();
             updateAccountSelectors();
             alert(`Đã thêm tài khoản ${accName} ($${accBal.toLocaleString()}) thành công!`);
             closeAccountModal();
